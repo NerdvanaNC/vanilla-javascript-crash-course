@@ -36,14 +36,14 @@ class UI { // static class; never instantiated
     });
   }
 
-  static showAlert(alert = {'type': 'info', 'content': 'This is an alert!'}) {
+  static showAlert(alertType = 'info', alertContent = 'This is an alert!') {
     const acceptableAlertClasses = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark'];
-    const alertClass = acceptableAlertClasses.includes(alert.type) ? alert.type : 'info';
+    const alertClass = acceptableAlertClasses.includes(alertType) ? alertType : 'info';
 
     const alertElement = document.createElement('div');
     alertElement.className += 'm-0 alert alert-' + alertClass;
     alertElement.setAttribute('role', 'alert');
-    alertElement.innerText = alert.content;
+    alertElement.innerText = alertContent;
 
     document.querySelector('#alerts').appendChild(alertElement);
     setTimeout(() => {alertElement.remove()}, 3000);
@@ -64,21 +64,18 @@ class Storage {
     localStorage.clear();
     location.reload();
   }
+
+  static getAllBooks() {
+    for(let i = 0; i < localStorage.length; i++) {
+      let book = JSON.parse(localStorage.getItem(localStorage.key(i)));
+      UI.addBook(book);
+    }
+  }
 }
 
 // Event: First Load
-document.addEventListener('DOMContentLoaded', () => { // TODO: get books from localStorage and display
-  const book1 = new Book('Book One', 'John Doe', '3465161984');
-  const book2 = new Book('Book Two', 'Mary Smith', '4843516546');
-  const book3 = new Book('Book Three', 'Janet Jackson', '5741068416');
-
-  Storage.addBook(book1);
-  Storage.addBook(book2);
-  Storage.addBook(book3);
-
-  UI.addBook(book1);
-  UI.addBook(book2);
-  UI.addBook(book3);
+document.addEventListener('DOMContentLoaded', () => {
+  Storage.getAllBooks();
 });
 
 // Event: Add Book
@@ -88,12 +85,18 @@ document.querySelector('#book-form').addEventListener('submit', (e) => {
   const title = document.querySelector('#title').value;
   const author = document.querySelector('#author').value;
   const isbn = document.querySelector('#isbn').value;
-  const book = new Book(title, author, isbn);
 
-  Storage.addBook(book);
-  UI.addBook(book);
-  UI.clearFields();
-  UI.showAlert({'type': 'success', 'content': 'Book Added'});
+  if(title == "" || author == "" || isbn == "") {
+    UI.showAlert('warning', 'Please fill out all fields.');
+  } else {
+    const book = new Book(title, author, isbn);
+
+    Storage.addBook(book);
+    UI.addBook(book);
+    UI.clearFields();
+    UI.showAlert('success', 'Book Added');
+  }
+  
 });
 
 // Event: Delete Book
@@ -102,9 +105,28 @@ document.querySelector('#book-list').addEventListener('click', (e) => {
     const isbn = e.target.dataset.isbn;
     Storage.deleteBook(isbn);
     UI.deleteBook(isbn);
-    UI.showAlert({'type': 'danger', 'content': 'Book Removed'});
+    UI.showAlert('danger', 'Book Removed');
   }
 });
 
 // Event: Clear localStorage
-document.querySelector('.clear-local-storage').addEventListener('click', () => { Storage.clearStorage(); })
+document.querySelector('.clear-local-storage').addEventListener('click', () => { Storage.clearStorage(); });
+
+// Event: Load Dummy Data
+document.querySelector('.add-dummy-data').addEventListener('click', () => {
+  if(confirm('This will reset all data.')) {
+    Storage.clearStorage();
+
+    const book1 = new Book('Book One', 'John Doe', '3465161984');
+    const book2 = new Book('Book Two', 'Mary Smith', '4843516546');
+    const book3 = new Book('Book Three', 'Janet Jackson', '5741068416');
+
+    Storage.addBook(book1);
+    Storage.addBook(book2);
+    Storage.addBook(book3);
+
+    UI.addBook(book1);
+    UI.addBook(book2);
+    UI.addBook(book3);
+  }
+});
