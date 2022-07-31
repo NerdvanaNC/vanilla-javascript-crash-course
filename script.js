@@ -43,7 +43,7 @@ class UI { // static class; never instantiated
     const alertElement = document.createElement('div');
     alertElement.className += 'm-0 alert alert-' + alertClass;
     alertElement.setAttribute('role', 'alert');
-    alertElement.innerText = alertContent;
+    alertElement.appendChild(document.createTextNode(alertContent));
 
     document.querySelector('#alerts').appendChild(alertElement);
     setTimeout(() => {alertElement.remove()}, 3000);
@@ -71,6 +71,10 @@ class Storage {
       UI.addBook(book);
     }
   }
+
+  static checkBookExists(isbn) {
+    return localStorage.getItem(isbn) ? true : false;
+  }
 }
 
 // Event: First Load
@@ -88,6 +92,8 @@ document.querySelector('#book-form').addEventListener('submit', (e) => {
 
   if(title == "" || author == "" || isbn == "") {
     UI.showAlert('warning', 'Please fill out all fields.');
+  } else if(Storage.checkBookExists(isbn)) {
+    UI.showAlert('warning', 'That ISBN already exists.');
   } else {
     const book = new Book(title, author, isbn);
 
