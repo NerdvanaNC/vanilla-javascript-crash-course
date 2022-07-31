@@ -13,17 +13,16 @@
     <h1 class="display-4 text-center">
       <i class="fas fa-book-open"></i> Book List
     </h1>
-
     <form id="book-form">
-      <div class="form-group mt-2">
+      <div class="form-group mt-3">
         <label for="title">Title</label>
         <input type="text" id="title" class="form-control">
       </div>
-      <div class="form-group mt-2">
+      <div class="form-group mt-3">
         <label for="title">Author</label>
         <input type="text" id="author" class="form-control">
       </div>
-      <div class="form-group mt-2">
+      <div class="form-group mt-3">
         <label for="isbn">ISBN</label>
         <input type="text" id="isbn" class="form-control">
       </div>
@@ -46,7 +45,13 @@
           
         </tr>
       </tbody>
-    </table>
+    </table>    
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-5">
+      <button class="btn btn-danger clear-local-storage">Clear Local Storage</button>
+    </div>  
+  </div>  
+  <div id="alerts" class="fixed-bottom">
+    
   </div>
 </body>
 </html>
