@@ -91,6 +91,8 @@ document.querySelector('#book-form').addEventListener('submit', (e) => {
 
   if(title == "" || author == "" || isbn == "") {
     UI.showAlert('warning', 'Please fill out all fields.');
+  } else if(isbn.length > 10) {
+    UI.showAlert('warning', 'ISBN should be 10 numbers.');
   } else if(Storage.checkBookExists(isbn)) {
     UI.showAlert('warning', 'That ISBN already exists.');
   } else {
