@@ -11,7 +11,6 @@ class Book {
 class UI { // static class; never instantiated
   static addBook(book) {
     const list = document.querySelector('#book-list');
-
     const row = document.createElement('tr');
     row.setAttribute('data-isbn', book.isbn);    
     row.innerHTML = `
@@ -53,33 +52,33 @@ class UI { // static class; never instantiated
 // Storage Class: Handles Storage
 class Storage {
   static addBook(book) { // uses ISBN as the primary key
-    localStorage.setItem(`${book.isbn}`, JSON.stringify(book));
+    let books = localStorage.getItem('books') ? JSON.parse(localStorage.getItem('books')) : {};
+    books[book.isbn] = book;
+    localStorage.setItem('books', JSON.stringify(books));
   }
 
   static deleteBook(isbn) {
-    localStorage.removeItem(isbn);
-  }
-
-  static clearStorage() {
-    localStorage.clear();
-    location.reload();
-  }
-
-  static getAllBooks() {
-    for(let i = 0; i < localStorage.length; i++) {
-      let book = JSON.parse(localStorage.getItem(localStorage.key(i)));
-      UI.addBook(book);
-    }
+    let books = JSON.parse(localStorage.getItem('books'));
+    delete books[isbn];
+    localStorage.setItem('books', JSON.stringify(books));
   }
 
   static checkBookExists(isbn) {
-    return localStorage.getItem(isbn) ? true : false;
+    let books = localStorage.getItem('books') ? JSON.parse(localStorage.getItem('books')) : {};
+    return isbn in books;
+  }
+
+  static getAllBooks() {
+    return localStorage.getItem('books') ? JSON.parse(localStorage.getItem('books')) : {};
   }
 }
 
 // Event: First Load
 document.addEventListener('DOMContentLoaded', () => {
-  Storage.getAllBooks();
+  let books = Storage.getAllBooks();
+  for(book in books) {
+    UI.addBook(books[book]);
+  }
 });
 
 // Event: Add Book
@@ -101,8 +100,7 @@ document.querySelector('#book-form').addEventListener('submit', (e) => {
     UI.addBook(book);
     UI.clearFields();
     UI.showAlert('success', 'Book Added');
-  }
-  
+  }  
 });
 
 // Event: Delete Book
@@ -112,27 +110,5 @@ document.querySelector('#book-list').addEventListener('click', (e) => {
     Storage.deleteBook(isbn);
     UI.deleteBook(isbn);
     UI.showAlert('danger', 'Book Removed');
-  }
-});
-
-// Event: Clear localStorage
-document.querySelector('.clear-local-storage').addEventListener('click', () => { Storage.clearStorage(); });
-
-// Event: Load Dummy Data
-document.querySelector('.add-dummy-data').addEventListener('click', () => {
-  if(confirm('This will reset all data.')) {
-    Storage.clearStorage();
-
-    const book1 = new Book('Book One', 'John Doe', '3465161984');
-    const book2 = new Book('Book Two', 'Mary Smith', '4843516546');
-    const book3 = new Book('Book Three', 'Janet Jackson', '5741068416');
-
-    Storage.addBook(book1);
-    Storage.addBook(book2);
-    Storage.addBook(book3);
-
-    UI.addBook(book1);
-    UI.addBook(book2);
-    UI.addBook(book3);
   }
 });
